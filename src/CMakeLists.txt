@@ -3,6 +3,7 @@
 
 FILE(GLOB_RECURSE app_sources ${CMAKE_SOURCE_DIR}/src/*.*)
 idf_component_register(SRCS ${app_sources})
+set(COMPONENT_REQUIRES "json")
 
 target_add_binary_data(${COMPONENT_TARGET} ../../../libs/certs/isrg_root_x1.pem TEXT)
 target_add_binary_data(${COMPONENT_TARGET} ../../../libs/certs/digi_cert.pem TEXT)

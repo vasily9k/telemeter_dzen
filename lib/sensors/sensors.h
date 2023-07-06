@@ -101,7 +101,7 @@ static reRangeMonitor tempMonitorIndoor(20, 30, 0.1, nullptr, nullptr, nullptr);
 #define CONTROL_TEMP_BOILER_NOTIFY_TOO_HIGH   "☀️ Температура теплоносителя <i><b>слишком высокая</b></i>: <b>%.2f</b> °С"
 #define CONTROL_TEMP_BOILER_NOTIFY_NORMAL     "🆗 Температура теплоносителя <i><b>вернулась в нормальный диапазон</b></i>: <b>%.2f</b> °С"
 
-static reRangeMonitor tempMonitorBoiler(25, 80, 1.0, nullptr, nullptr, nullptr);
+static reRangeMonitor tempMonitorBoiler(29, 80, 1.0, nullptr, nullptr, nullptr);
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------- Задача --------------------------------------------------------

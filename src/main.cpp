@@ -114,6 +114,9 @@ extern "C" { void app_main(void)
   #if CONFIG_TELEGRAM_ENABLE
     tgTaskCreate();
     vTaskDelay(1);
+    tgTaskUpdatesCreate();
+    vTaskDelay(1);
+
   #endif // CONFIG_TELEGRAM_ENABLE
 
   // Запуск службы отправки данных на внешние сервисы

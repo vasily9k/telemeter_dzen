@@ -51,8 +51,8 @@ static bool monitorPublish(reRangeMonitor *monitor, char* topic, char* payload, 
 
 static void sensorsMqttTopicsCreate(bool primary)
 {
-  sensorOutdoor.topicsCreate(primary);
-  sensorIndoor.topicsCreate(primary);
+  //sensorOutdoor.topicsCreate(primary);
+  //sensorIndoor.topicsCreate(primary);
   if (tempMonitorIndoor.mqttTopicCreate(primary, CONTROL_TEMP_LOCAL, CONTROL_TEMP_GROUP_TOPIC, CONTROL_TEMP_INDOOR_TOPIC, nullptr)) {
     rlog_i(logTAG, "Generated topic for indoor temperture control: [ %s ]", tempMonitorIndoor.mqttTopicGet());
   };
@@ -64,8 +64,8 @@ static void sensorsMqttTopicsCreate(bool primary)
 
 static void sensorsMqttTopicsFree()
 {
-  sensorOutdoor.topicsFree();
-  sensorIndoor.topicsFree();
+  //sensorOutdoor.topicsFree();
+  //sensorIndoor.topicsFree();
   tempMonitorIndoor.mqttTopicFree();
   sensorBoiler.topicsFree();
   tempMonitorBoiler.mqttTopicFree();
@@ -109,8 +109,8 @@ static void sensorsStoreData()
 {
   rlog_i(logTAG, "Store sensors data");
 
-  sensorOutdoor.nvsStoreExtremums(SENSOR_OUTDOOR_KEY);
-  sensorIndoor.nvsStoreExtremums(SENSOR_INDOOR_KEY);
+  //sensorOutdoor.nvsStoreExtremums(SENSOR_OUTDOOR_KEY);
+  //sensorIndoor.nvsStoreExtremums(SENSOR_INDOOR_KEY);
   sensorBoiler.nvsStoreExtremums(SENSOR_BOILER_KEY);
 
   tempMonitorIndoor.nvsStore(CONTROL_TEMP_INDOOR_KEY);
@@ -174,12 +174,14 @@ static void sensorsInitSensors()
       CONFIG_FORMAT_TIMESTAMP_S, CONFIG_FORMAT_TSVALUE
     #endif // CONFIG_SENSOR_TIMESTRING_ENABLE
   );
+  /*
   sensorOutdoor.initExtItems(SENSOR_OUTDOOR_NAME, SENSOR_OUTDOOR_TOPIC, false,
     DHT_DHT22, CONFIG_GPIO_AM2320, false, CONFIG_GPIO_RELAY_AM2320, 1,
     &siOutdoorHum, &siOutdoorTemp,
     3000, SENSOR_OUTDOOR_ERRORS_LIMIT, nullptr, sensorsPublish);
   sensorOutdoor.registerParameters(pgSensors, SENSOR_OUTDOOR_KEY, SENSOR_OUTDOOR_TOPIC, SENSOR_OUTDOOR_NAME);
   sensorOutdoor.nvsRestoreExtremums(SENSOR_OUTDOOR_KEY);
+  */
 
   // Комната
   static rPressureItem siIndoorPress(nullptr, CONFIG_SENSOR_PRESSURE_NAME, CONFIG_FORMAT_PRESSURE_UNIT,
@@ -213,13 +215,13 @@ static void sensorsInitSensors()
       CONFIG_FORMAT_TIMESTAMP_S, CONFIG_FORMAT_TSVALUE
     #endif // CONFIG_SENSOR_TIMESTRING_ENABLE
   );
-  sensorIndoor.initExtItems(SENSOR_INDOOR_NAME, SENSOR_INDOOR_TOPIC, false,
+  /*sensorIndoor.initExtItems(SENSOR_INDOOR_NAME, SENSOR_INDOOR_TOPIC, false,
     SENSOR_INDOOR_BUS, SENSOR_INDOOR_ADDRESS, 
     BME280_MODE_FORCED, BME280_STANDBY_1000ms, BME280_FLT_NONE, BME280_OSM_X4, BME280_OSM_X4, BME280_OSM_X4,
     &siIndoorPress, &siIndoorTemp, &siIndoorHum, 
-    3000, SENSOR_INDOOR_ERRORS_LIMIT, nullptr, sensorsPublish);
-  sensorIndoor.registerParameters(pgSensors, SENSOR_INDOOR_KEY, SENSOR_INDOOR_TOPIC, SENSOR_INDOOR_NAME);
-  sensorIndoor.nvsRestoreExtremums(SENSOR_INDOOR_KEY);
+    3000, SENSOR_INDOOR_ERRORS_LIMIT, nullptr, sensorsPublish);*/
+  //sensorIndoor.registerParameters(pgSensors, SENSOR_INDOOR_KEY, SENSOR_INDOOR_TOPIC, SENSOR_INDOOR_NAME);
+  ////sensorIndoor.nvsRestoreExtremums(SENSOR_INDOOR_KEY);
   tempMonitorIndoor.nvsRestore(CONTROL_TEMP_INDOOR_KEY);
   tempMonitorIndoor.setStatusCallback(monitorNotifyIndoor);
   tempMonitorIndoor.mqttSetCallback(monitorPublish);
@@ -306,32 +308,32 @@ static void sensorsResetExtremumsSensor(rSensor* sensor, const char* sensor_name
 static void sensorsResetExtremumsSensors(uint8_t mode)
 {
   if (mode == 0) {
-    sensorOutdoor.resetExtremumsTotal();
-    sensorIndoor.resetExtremumsTotal();
+    //sensorOutdoor.resetExtremumsTotal();
+    //sensorIndoor.resetExtremumsTotal();
     sensorBoiler.resetExtremumsTotal();
     #if CONFIG_TELEGRAM_ENABLE
       tgSend(CONFIG_SENSOR_COMMAND_KIND, CONFIG_SENSOR_COMMAND_PRIORITY, CONFIG_SENSOR_COMMAND_NOTIFY, CONFIG_TELEGRAM_DEVICE,
         CONFIG_MESSAGE_TG_SENSOR_CLREXTR_TOTAL_ALL);
     #endif // CONFIG_TELEGRAM_ENABLE
   } else if (mode == 1) {
-    sensorOutdoor.resetExtremumsDaily();
-    sensorIndoor.resetExtremumsDaily();
+    //sensorOutdoor.resetExtremumsDaily();
+    //sensorIndoor.resetExtremumsDaily();
     sensorBoiler.resetExtremumsDaily();
     #if CONFIG_TELEGRAM_ENABLE
       tgSend(CONFIG_SENSOR_COMMAND_KIND, CONFIG_SENSOR_COMMAND_PRIORITY, CONFIG_SENSOR_COMMAND_NOTIFY, CONFIG_TELEGRAM_DEVICE,
         CONFIG_MESSAGE_TG_SENSOR_CLREXTR_DAILY_ALL);
     #endif // CONFIG_TELEGRAM_ENABLE
   } else if (mode == 2) {
-    sensorOutdoor.resetExtremumsWeekly();
-    sensorIndoor.resetExtremumsWeekly();
+    //sensorOutdoor.resetExtremumsWeekly();
+    //sensorIndoor.resetExtremumsWeekly();
     sensorBoiler.resetExtremumsWeekly();
     #if CONFIG_TELEGRAM_ENABLE
       tgSend(CONFIG_SENSOR_COMMAND_KIND, CONFIG_SENSOR_COMMAND_PRIORITY, CONFIG_SENSOR_COMMAND_NOTIFY, CONFIG_TELEGRAM_DEVICE,
         CONFIG_MESSAGE_TG_SENSOR_CLREXTR_WEEKLY_ALL);
     #endif // CONFIG_TELEGRAM_ENABLE
   } else if (mode == 3) {
-    sensorOutdoor.resetExtremumsEntirely();
-    sensorIndoor.resetExtremumsEntirely();
+    //sensorOutdoor.resetExtremumsEntirely();
+    //sensorIndoor.resetExtremumsEntirely();
     sensorBoiler.resetExtremumsEntirely();
     #if CONFIG_TELEGRAM_ENABLE
       tgSend(CONFIG_SENSOR_COMMAND_KIND, CONFIG_SENSOR_COMMAND_PRIORITY, CONFIG_SENSOR_COMMAND_NOTIFY, CONFIG_TELEGRAM_DEVICE,
@@ -386,9 +388,9 @@ static void sensorsCommandsEventHandler(void* arg, esp_event_base_t event_base, 
           sensorsResetExtremumsSensors(imode);
         } else {
           if (strcasecmp(sensor, SENSOR_OUTDOOR_TOPIC) == 0) {
-            sensorsResetExtremumsSensor(&sensorOutdoor, SENSOR_OUTDOOR_TOPIC, imode);
+            //sensorsResetExtremumsSensor(&sensorOutdoor, SENSOR_OUTDOOR_TOPIC, imode);
           } else if (strcasecmp(sensor, SENSOR_INDOOR_TOPIC) == 0) {
-            sensorsResetExtremumsSensor(&sensorIndoor, SENSOR_INDOOR_TOPIC, imode);
+            //sensorsResetExtremumsSensor(&sensorIndoor, SENSOR_INDOOR_TOPIC, imode);
           } else if (strcasecmp(sensor, SENSOR_BOILER_TOPIC) == 0) {
             sensorsResetExtremumsSensor(&sensorBoiler, SENSOR_BOILER_TOPIC, imode);
           } else {
@@ -489,14 +491,17 @@ void sensorsTaskExec(void *pvParameters)
     // -----------------------------------------------------------------------------------------------------
     // Чтение данных с сенсоров
     // -----------------------------------------------------------------------------------------------------
+    /*
     sensorOutdoor.readData();
     if (sensorOutdoor.getStatus() == SENSOR_STATUS_OK) {
       rlog_i("OUTDOOR", "Values raw: %.2f °С / %.2f %% | out: %.2f °С / %.2f %% | min: %.2f °С / %.2f %% | max: %.2f °С / %.2f %%", 
         sensorOutdoor.getValue2(false).rawValue, sensorOutdoor.getValue1(false).rawValue, 
         sensorOutdoor.getValue2(false).filteredValue, sensorOutdoor.getValue1(false).filteredValue, 
         sensorOutdoor.getExtremumsDaily2(false).minValue.filteredValue, sensorOutdoor.getExtremumsDaily1(false).minValue.filteredValue, 
-        sensorOutdoor.getExtremumsDaily2(false).maxValue.filteredValue, sensorOutdoor.getExtremumsDaily1(false).maxValue.filteredValue);
+        //sensorOutdoor.getExtremumsDaily2(false).maxValue.filteredValue, //sensorOutdoor.getExtremumsDaily1(false).maxValue.filteredValue);
     };
+    */
+   /*
     sensorIndoor.readData();
     if (sensorIndoor.getStatus() == SENSOR_STATUS_OK) {
       rlog_i("INDOOR", "Values raw: %.2f °С / %.2f %% | out: %.2f °С / %.2f %% | min: %.2f °С / %.2f %% | max: %.2f °С / %.2f %%", 
@@ -505,6 +510,7 @@ void sensorsTaskExec(void *pvParameters)
         sensorIndoor.getExtremumsDaily2(false).minValue.filteredValue, sensorIndoor.getExtremumsDaily3(false).minValue.filteredValue, 
         sensorIndoor.getExtremumsDaily2(false).maxValue.filteredValue, sensorIndoor.getExtremumsDaily3(false).maxValue.filteredValue);
     };
+    */
     sensorBoiler.readData();
     if (sensorBoiler.getStatus() == SENSOR_STATUS_OK) {
       rlog_i("BOILER", "Values raw: %.2f °С | out: %.2f °С | min: %.2f °С | max: %.2f °С", 
@@ -517,10 +523,11 @@ void sensorsTaskExec(void *pvParameters)
     // -----------------------------------------------------------------------------------------------------
     // Контроль температуры
     // -----------------------------------------------------------------------------------------------------
-
+    /*
     if (sensorIndoor.getStatus() == SENSOR_STATUS_OK) {
       tempMonitorIndoor.checkValue(sensorIndoor.getValue2(false).filteredValue);
     };
+    */
     if (sensorBoiler.getStatus() == SENSOR_STATUS_OK) {
       tempMonitorBoiler.checkValue(sensorBoiler.getValue(false).filteredValue);
     };
@@ -541,8 +548,8 @@ void sensorsTaskExec(void *pvParameters)
     // MQTT брокер
     if (esp_heap_free_check() && statesMqttIsConnected() && timerTimeout(&mqttPubTimer)) {
       timerSet(&mqttPubTimer, iMqttPubInterval*1000);
-      sensorOutdoor.publishData(false);
-      sensorIndoor.publishData(false);
+      //sensorOutdoor.publishData(false);
+      //sensorIndoor.publishData(false);
       tempMonitorIndoor.mqttPublish();
       sensorBoiler.publishData(false);
       tempMonitorBoiler.mqttPublish();

@@ -6,4 +6,5 @@ configs/
 *.log
 *.hidden
 *.public
-
+build/
+debug/
