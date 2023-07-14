@@ -40,6 +40,9 @@
 #include "reElTariffs.h"
 #endif // CONFIG_ELTARIFFS_ENABLED
 #include "sensors.h"
+#include "command.h"
+
+QueueHandle_t _cmdQueue = nullptr;
 
 // Главная функция
 extern "C" { void app_main(void) 
@@ -114,7 +117,7 @@ extern "C" { void app_main(void)
   #if CONFIG_TELEGRAM_ENABLE
     tgTaskCreate();
     vTaskDelay(1);
-    tgTaskUpdatesCreate();
+    tgTaskUpdatesCreate(&_cmdQueue);
     vTaskDelay(1);
 
   #endif // CONFIG_TELEGRAM_ENABLE
@@ -134,6 +137,11 @@ extern "C" { void app_main(void)
   // Запуск службы контроля температуры
   sensorsTaskStart();
   vTaskDelay(1);
+
+  // Запуск коммандного процессора
+  cmdTaskCreate(&_cmdQueue);
+  vTaskDelay(1);
+
 
   // Подключение к WiFi AP
   if (!wifiStart()) {

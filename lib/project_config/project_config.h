@@ -1,4 +1,4 @@
-﻿/*
+/*
    -----------------------------------------------------------------------------------------------------------------------
    EN: Project configuration file, accessible from all libraries connected to the project
    RU: Файл конфигурации проекта, он должен быть доступен из всех файлов проекта, в том числе и библиотек
@@ -11,12 +11,14 @@
 
 #include <stdint.h>
 #include "esp_task.h"
-
+#define INCLUDE_pcTaskGetTaskName 1
 // -----------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------- EN - Version ----------------------------------------------------------
 // ----------------------------------------------- RU - Версии -----------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
-#define APP_VERSION "20230219.005"
+#define APP_VERSION "20230713.007"
+// 20230713.007: Telegram bot добавлен
+// 20230625.006: Адаптация под linux
 // 20230219.005: MQTT client: исправлена проблема переключения на резервный MQTT сервер, если он используется
 // 20230215.004: Адаптация под версию ESP-IDF 5.0.0
 // 20230210.003: Адаптация под ESP-IDF 4.4.3, добавлена поддержка статических буферов для I2C
@@ -29,23 +31,23 @@
 // -----------------------------------------------------------------------------------------------------------------------
 // EN: Peripheral pin number
 // RU: Номер выводов периферии, версия платы 9.05
-#define CONFIG_GPIO_SYSTEM_LED   33
-#define CONFIG_GPIO_ALARM_LED    23
-#define CONFIG_GPIO_ALARM_SIREN  25
-#define CONFIG_GPIO_ALARM_FLASH  26
+#define CONFIG_GPIO_SYSTEM_LED   2
+//#define CONFIG_GPIO_ALARM_LED    23
+//#define CONFIG_GPIO_ALARM_SIREN  25
+//#define CONFIG_GPIO_ALARM_FLASH  26
 // #define CONFIG_GPIO_BUZZER       13
-#define CONFIG_GPIO_RX433        15
-#define CONFIG_GPIO_DS18B20      4
-#define CONFIG_GPIO_AM2320       0
-#define CONFIG_GPIO_RELAY_AM2320 32
-#define CONFIG_GPIO_RELAY_BOILER 27
+//#define CONFIG_GPIO_RX433        15
+#define CONFIG_GPIO_DS18B20      23
+//#define CONFIG_GPIO_AM2320       0
+//#define CONFIG_GPIO_RELAY_AM2320 32
+//#define CONFIG_GPIO_RELAY_BOILER 27
 // EN: Alarm zones
 // RU: Зоны ОПС
-#define CONFIG_GPIO_ALARM_ZONE_1 18
-#define CONFIG_GPIO_ALARM_ZONE_2 19
-#define CONFIG_GPIO_ALARM_ZONE_3 12
-#define CONFIG_GPIO_ALARM_ZONE_4 14
-#define CONFIG_GPIO_ALARM_ZONE_5 2
+//#define CONFIG_GPIO_ALARM_ZONE_1 18
+//#define CONFIG_GPIO_ALARM_ZONE_2 19
+//#define CONFIG_GPIO_ALARM_ZONE_3 12
+//#define CONFIG_GPIO_ALARM_ZONE_4 14
+//#define CONFIG_GPIO_ALARM_ZONE_5 2
 // EN: I2C bus #0: pins, pullup, frequency
 // RU: Шина I2C #0: выводы, подтяжка, частота, размер статического буфера в транзациях
 #define CONFIG_I2C_PORT0_SDA     21
@@ -78,7 +80,7 @@
 /* Silent mode (no sounds, no blinks) */
 // EN: Allow "quiet" mode. Quiet mode is the period of time of day when LED flashes and sounds are blocked.
 // RU: Разрешить "тихий" режим. Тихий режим - это период времени суток, когда блокируются вспышки светодиодов и звуки.
-#define CONFIG_SILENT_MODE_ENABLE 1
+#define CONFIG_SILENT_MODE_ENABLE 0
 #define CONFIG_SILENT_MODE_EXTENDED 0
 // EN: Interval in H1M1H2M2 format. That is, the interval 21:00 -> 06:00 is 21000600
 // RU: Интервал в формате H1M1H2M2. То есть интервал 21:00 -> 06:00 это 21000600
@@ -164,12 +166,12 @@
  * Это позволяет переносить устройство из одного здания в другое, не перепрошивая и перенастраивая его. 
  * Просто заранее определите все возможные сети.
  * */
-#define CONFIG_WIFI_1_SSID "WIFI1"
-#define CONFIG_WIFI_1_PASS "000000000"
-#define CONFIG_WIFI_2_SSID "WIFI2"
-#define CONFIG_WIFI_2_PASS "111111111"
-#define CONFIG_WIFI_3_SSID "WIFI3"
-#define CONFIG_WIFI_3_PASS "222222222"
+#define CONFIG_WIFI_1_SSID "s1"
+#define CONFIG_WIFI_1_PASS "11111111"
+#define CONFIG_WIFI_2_SSID "m9"
+#define CONFIG_WIFI_2_PASS "11111111"
+#define CONFIG_WIFI_3_SSID "h3"
+#define CONFIG_WIFI_3_PASS "11111111"
 #define CONFIG_WIFI_4_SSID "WIFI4"
 #define CONFIG_WIFI_4_PASS "333333333"
 #define CONFIG_WIFI_5_SSID "WIFI5"
@@ -224,13 +226,13 @@
 #define CONFIG_MQTT1_KEEP_ALIVE 60
 #define CONFIG_MQTT1_TIMEOUT 10000
 #define CONFIG_MQTT1_RECONNECT 10000
-#define CONFIG_MQTT1_CLIENTID "esp32_thermostat"
+#define CONFIG_MQTT1_CLIENTID "esp32_thermostat545454"
 // #define CONFIG_MQTT1_LOC_PREFIX ""
 // #define CONFIG_MQTT1_PUB_PREFIX ""
-#define CONFIG_MQTT1_LOC_LOCATION "local/village"
-#define CONFIG_MQTT1_PUB_LOCATION "village"
-#define CONFIG_MQTT1_LOC_DEVICE "thermostat"
-#define CONFIG_MQTT1_PUB_DEVICE "thermostat"
+#define CONFIG_MQTT1_LOC_LOCATION "local/village54"
+#define CONFIG_MQTT1_PUB_LOCATION "village54"
+#define CONFIG_MQTT1_LOC_DEVICE "thermostat54"
+#define CONFIG_MQTT1_PUB_DEVICE "thermostat54"
 
 /****************** MQTT : pinger ********************/
 // EN: Allow the publication of ping results on the MQTT broker
@@ -239,7 +241,7 @@
 #if CONFIG_MQTT_PINGER_ENABLE
 // EN: Ping results topic name
 // RU: Название топика результатов пинга
-#define CONFIG_MQTT_PINGER_TOPIC "ping"
+#define CONFIG_MQTT_PINGER_TOPIC "ping54"
 #define CONFIG_MQTT_PINGER_LOCAL 0
 #define CONFIG_MQTT_PINGER_QOS 0
 #define CONFIG_MQTT_PINGER_RETAINED 1
@@ -274,7 +276,7 @@
 // -----------------------------------------------------------------------------------------------------------------------
 // EN: Enable sending data to open-monitoring.online
 // RU: Включить отправку данных на open-monitoring.online
-#define CONFIG_OPENMON_ENABLE 1
+#define CONFIG_OPENMON_ENABLE 0
 #if CONFIG_OPENMON_ENABLE
 // EN: Frequency of sending data in seconds
 // RU: Периодичность отправки данных в секундах
@@ -303,7 +305,7 @@
 
 // EN: Enable sending data to narodmon.ru
 // RU: Включить отправку данных на narodmon.ru
-#define CONFIG_NARODMON_ENABLE 1
+#define CONFIG_NARODMON_ENABLE 0
 #if CONFIG_NARODMON_ENABLE
 // EN: Frequency of sending data in seconds
 // RU: Периодичность отправки данных в секундах
@@ -318,7 +320,7 @@
 // -----------------------------------------------------------------------------------------------------------------------
 // EN: Enable sending data to thingspeak.com
 // RU: Включить отправку данных на thingspeak.com
-#define CONFIG_THINGSPEAK_ENABLE 1
+#define CONFIG_THINGSPEAK_ENABLE 0
 #if CONFIG_THINGSPEAK_ENABLE
 // EN: Frequency of sending data in seconds
 // RU: Периодичность отправки данных в секундах
@@ -346,19 +348,19 @@
 #define CONFIG_TELEGRAM_ENABLE 1
 // EN: Telegram API bot token
 // RU: Токен бота API Telegram
-#define CONFIG_TELEGRAM_TOKEN "7271238860:5TT9VrUmL33INA-AAEVmwj_w25usmWvdjaE"
+#define CONFIG_TELEGRAM_TOKEN "5877344618:AAGDiV64rSr43C3KahsB8p98mZjoXsqcleE"
 // EN: Chat or group ID
 // RU: Идентификатор чата или группы
-#define CONFIG_TELEGRAM_CHAT_ID_MAIN     "-572534150"
-#define CONFIG_TELEGRAM_CHAT_ID_SERVICE  "-1009183247562"
+#define CONFIG_TELEGRAM_CHAT_ID_MAIN     "6160382789"
+#define CONFIG_TELEGRAM_CHAT_ID_SERVICE  "6160382789"
 #define CONFIG_TELEGRAM_CHAT_ID_PARAMS   CONFIG_TELEGRAM_CHAT_ID_SERVICE
 #define CONFIG_TELEGRAM_CHAT_ID_SECURITY CONFIG_TELEGRAM_CHAT_ID_MAIN
 // EN: Send message header (device name, see CONFIG_TELEGRAM_DEVICE)
 // RU: Отправлять заголовок сообщения (название устройства, см. CONFIG_TELEGRAM_DEVICE)
-#define CONFIG_TELEGRAM_TITLE_ENABLED 0
+#define CONFIG_TELEGRAM_TITLE_ENABLED 1
 // EN: Device name (published as message header)
 // RU: Название устройства (публикуется в качестве заголовка сообщения)
-#define CONFIG_TELEGRAM_DEVICE "🏡 ДОМ"
+#define CONFIG_TELEGRAM_DEVICE "🏡 дам"
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------- EN - Notifies ----------------------------------------------------------
@@ -441,7 +443,7 @@
 #define CONFIG_RLOG_SHOW_TIMESTAMP 1
 // EN: Add file and line information to messages
 // RU: Добавлять информацию о файле и строке к сообщениям
-#define CONFIG_RLOG_SHOW_FILEINFO 0
+#define CONFIG_RLOG_SHOW_FILEINFO 1
 
 
 // EN: Preserve debugging information across device software restarts
@@ -455,7 +457,7 @@
 #define CONFIG_RESTART_DEBUG_STACK_DEPTH 28
 // EN: Allow publishing debug info from WiFi module
 // RU: Разрешить публикацию отладочной информации из модуля WiFi
-#define CONFIG_WIFI_DEBUG_ENABLE 0
+#define CONFIG_WIFI_DEBUG_ENABLE 1
 // EN: Allow periodic publication of system information
 // RU: Разрешить периодическую публикацию системной информации
 #define CONFIG_MQTT_SYSINFO_ENABLE 1
