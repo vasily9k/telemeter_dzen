@@ -37,7 +37,7 @@
 //#define CONFIG_GPIO_ALARM_FLASH  26
 // #define CONFIG_GPIO_BUZZER       13
 //#define CONFIG_GPIO_RX433        15
-#define CONFIG_GPIO_DS18B20      23
+#define CONFIG_GPIO_DS18B20      17
 //#define CONFIG_GPIO_AM2320       0
 //#define CONFIG_GPIO_RELAY_AM2320 32
 //#define CONFIG_GPIO_RELAY_BOILER 27
@@ -57,8 +57,8 @@
 #define CONFIG_I2C_PORT0_STATIC  2
 // EN: I2C bus #1: pins, pullup, frequency
 // RU: Шина I2C #1: выводы, подтяжка, частота, размер статического буфера в транзациях
-#define CONFIG_I2C_PORT1_SDA     17
-#define CONFIG_I2C_PORT1_SCL     16
+#define CONFIG_I2C_PORT1_SDA     27
+#define CONFIG_I2C_PORT1_SCL     26
 #define CONFIG_I2C_PORT1_PULLUP  false
 #define CONFIG_I2C_PORT1_FREQ_HZ 100000
 #define CONFIG_I2C_PORT1_STATIC  2
@@ -172,8 +172,8 @@
 #define CONFIG_WIFI_2_PASS "11111111"
 #define CONFIG_WIFI_3_SSID "h3"
 #define CONFIG_WIFI_3_PASS "11111111"
-#define CONFIG_WIFI_4_SSID "WIFI4"
-#define CONFIG_WIFI_4_PASS "333333333"
+#define CONFIG_WIFI_4_SSID "t4"
+#define CONFIG_WIFI_4_PASS "11111111"
 #define CONFIG_WIFI_5_SSID "WIFI5"
 #define CONFIG_WIFI_5_PASS "444444444"
 
@@ -237,7 +237,7 @@
 /****************** MQTT : pinger ********************/
 // EN: Allow the publication of ping results on the MQTT broker
 // RU: Разрешить публикацию результатов пинга на MQTT брокере
-#define CONFIG_MQTT_PINGER_ENABLE 1
+#define CONFIG_MQTT_PINGER_ENABLE 0
 #if CONFIG_MQTT_PINGER_ENABLE
 // EN: Ping results topic name
 // RU: Название топика результатов пинга
@@ -252,7 +252,7 @@
 /*************** MQTT : remote control ***************/
 // EN: Allow the device to process incoming commands
 // RU: Разрешить обработку входящих команд устройством
-#define CONFIG_MQTT_COMMAND_ENABLE 1
+#define CONFIG_MQTT_COMMAND_ENABLE 0
 // EN: Allow OTA updates via a third party server
 // RU: Разрешить OTA обновления через сторонний сервер
 #define CONFIG_MQTT_OTA_ENABLE 1
@@ -348,7 +348,7 @@
 #define CONFIG_TELEGRAM_ENABLE 1
 // EN: Telegram API bot token
 // RU: Токен бота API Telegram
-#define CONFIG_TELEGRAM_TOKEN "5877344618:AAGDiV64rSr43C3KahsB8p98mZjoXsqcleE"
+#define CONFIG_TELEGRAM_TOKEN "5877344618:AAEkQlDaAlBm1uGxO1VEOSk9eZXDXW4ChhU"
 // EN: Chat or group ID
 // RU: Идентификатор чата или группы
 #define CONFIG_TELEGRAM_CHAT_ID_MAIN     "6160382789"
@@ -390,6 +390,9 @@
 // RU: Уведомления в Telegram при тревогах охраны
 #define CONFIG_NOTIFY_TELEGRAM_ALARM_ALARM 1
 #define CONFIG_NOTIFY_TELEGRAM_ALARM_ALERT_ALARM 1
+#define CONFIG_TELEGRAM_ENABLE 1
+#define CONFIG_NOTIFY_TELEGRAM_START 1
+#define CONFIG_RESTART_DEBUG_INFO 1
 
 // -----------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------- EN - Sensors -------------------------------------------------------

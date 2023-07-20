@@ -1,17 +1,28 @@
 #include "command.h"
 
-static const char* logTAG = "CMD";
-static const char* cmdTaskName = "cmd_processor";
+#define COMMAND_OTA_URL_TMPL "https://api.telegram.org/file/bot" CONFIG_TELEGRAM_TOKEN "/documents/file_%d.bin"
+
+static const char *logTAG = "CMD";
+static const char *cmdTaskName = "cmd_processor";
 TaskHandle_t _cmdTask;
 QueueHandle_t *_cmdQueueP = nullptr;
+
+void restart_task(void *pvParameters)
+{
+  rloga_e("Перезагрузка по команде пользователя через 10 секунд");
+  vTaskDelay(pdMS_TO_TICKS(10000));
+  // esp_restart(); // Restart the system
+  espRestart(RR_COMMAND_RESET);
+  vTaskDelete(nullptr);
+}
 
 void cmdTaskExec(void *pvParameters)
 {
   tgUpdateMessage_t *cmdMsg;
-
-  while (true) {
-    if (xQueueReceive(*_cmdQueueP, &cmdMsg, portMAX_DELAY) == pdPASS) {
-
+  while (true)
+  {
+    if (xQueueReceive(*_cmdQueueP, &cmdMsg, portMAX_DELAY) == pdPASS)
+    {
       tgUpdateMessage_t cmdMsgReceived;
       memset(&cmdMsgReceived, 0, sizeof(tgUpdateMessage_t));
 
@@ -25,38 +36,47 @@ void cmdTaskExec(void *pvParameters)
       u_int8_t perm_level = permission_check(&cmdMsgReceived);
       char *answer = nullptr;
 
-      if (perm_level > CMD_PERMISSION_DENIED) {
-        switch(cmdMsgReceived.type) {
-            case TG_MESSAGE_TEXT:
-                cmdMsgReceived.text = cmdMsg->text;
-                rlog_d(logTAG, "New command received: %s", cmdMsg->text);
-
-                answer = cmdProcessor(&cmdMsgReceived, perm_level);
-                break;
-            case TG_MESSAGE_DOCUMENT:
-                cmdMsgReceived.file = cmdMsg->file;
-                printFileInfo(&cmdMsgReceived);
-                break;
-            case TG_MESSAGE_UNKNOWN:
-                //rlog_d(logTAG, "HTTP_EVENT_HEADER_SENT");
-                break;
+      if (perm_level > CMD_PERMISSION_DENIED)
+      {
+        switch (cmdMsgReceived.type)
+        {
+        case TG_MESSAGE_TEXT:
+          cmdMsgReceived.text = cmdMsg->text;
+          rlog_d(logTAG, "New command received: %s", cmdMsg->text);
+          answer = cmdProcessor(&cmdMsgReceived, perm_level);
+          break;
+        case TG_MESSAGE_DOCUMENT:
+          cmdMsgReceived.file = cmdMsg->file;
+          printFileInfo(&cmdMsgReceived);
+          tgGetFileApi(cmdMsg->file->id);
+          break;
+        case TG_MESSAGE_LINKTOFILE:
+          cmdMsgReceived.text = cmdMsg->text;
+          rlog_d(logTAG, "Upgrade link: %s", cmdMsg->text);
+          answer = cmdProcessor(&cmdMsgReceived, perm_level);
+          break;
+        default:
+          rlog_d(logTAG, "Не пойми что пришло");
+          break;
         };
-
       }
-      if (answer) {
-          rlog_d(logTAG, "answer is: %s", answer);
-          tgSend(MK_MAIN, MP_CRITICAL, "Результат команды ", CONFIG_TELEGRAM_DEVICE,"%s", answer);
-          //free(answer);
-      } else {
-          rlog_d(logTAG, "answer is empty:");
+      if (answer)
+      {
+        rlog_d(logTAG, "answer is: %s", answer);
+        tgSend(MK_MAIN, MP_CRITICAL, "Результат команды ", CONFIG_TELEGRAM_DEVICE, "%s", answer);
+        // free(answer);
+      }
+      else
+      {
+        rlog_d(logTAG, "answer is empty:");
       }
 
-      //if (cmdMsg->text) free(cmdMsg->text);
-      if (cmdMsg->file) free(cmdMsg->file);
+      // if (cmdMsg->text) free(cmdMsg->text);
+      if (cmdMsg->file)
+        free(cmdMsg->file);
       free(cmdMsg);
       cmdMsg = nullptr;
-      //if (answer) free(answer);
-
+      // if (answer) free(answer);
     };
   };
 }
@@ -64,52 +84,124 @@ void cmdTaskExec(void *pvParameters)
 bool cmdTaskCreate(QueueHandle_t *cmdQueue)
 {
   _cmdQueueP = cmdQueue;
-
-  if (!_cmdTask) {
-    if (!*_cmdQueueP) {
+  if (!_cmdTask)
+  {
+    if (!*_cmdQueueP)
+    {
       rloga_e("The _cmdQueueP is not available!");
-      //eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_FAIL);
+      // eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_FAIL);
       return false;
     };
-    
+
     xTaskCreatePinnedToCore(cmdTaskExec, cmdTaskName, 4096, nullptr, CONFIG_TASK_PRIORITY_TELEGRAM, &_cmdTask, CONFIG_TASK_CORE_TELEGRAM);
-    if (!_cmdTask) {
+    if (!_cmdTask)
+    {
       rloga_e("Failed to create command processor task!");
-      //eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_FAIL);
+      // eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_FAIL);
       return false;
     }
-    else {
+    else
+    {
       rloga_i("Task [ %s ] has been successfully started", cmdTaskName);
-      //eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_OK);
+      // eventLoopPostError(RE_SYS_TELEGRAM_ERROR, ESP_OK);
       return true;
     };
   }
-  else {
+  else
+  {
     return true;
   };
 }
 
-u_int8_t permission_check(tgUpdateMessage_t *msg) {
+u_int8_t permission_check(tgUpdateMessage_t *msg)
+{
   rlog_d(logTAG, "PERM Received chat_id: %" PRId64 ", from_id: %" PRId64 ", date: %d",
-          msg->chat_id, msg->from_id, msg->date);
+         msg->chat_id, msg->from_id, msg->date);
   return CMD_PERMISSION_SU;
 }
 
-char * cmdProcessor(tgUpdateMessage_t *msg, u_int8_t perm_level) {
-  const char fmt[] = "Пришла команда:%s";
-  int sz = snprintf(NULL, 0, fmt, (const char*) msg->text);
-  char *buf = (char*)esp_calloc(1, sz + 1);
-  snprintf(buf, sz + 1, fmt, (const char*) msg->text);
-  rlog_d(logTAG, "cmdProcessor return: %s", buf);
-  return buf;
+char *cmdProcessor(tgUpdateMessage_t *msg, u_int8_t perm_level)
+{
+  if (strcmp(msg->text, "/status") == 0)
+  {
+    char *debug_heap = statesGetDebugHeap();
+    return debug_heap;
+  }
+  else if (strcmp(msg->text, "/hi") == 0)
+  {
+    return (char *)"Привет";
+  }
+  else if (strcmp(msg->text, "/reboot") == 0)
+  {
+    xTaskCreate(&restart_task, "restart_task", 2048, NULL, 5, NULL);
+    return (char *)"Перезагрузка по команде пользователя";
+  }
+  else if (strcmp(msg->text, "/new_firmware_approve") == 0)
+  {
+    statesFirmwareVerifyCompete();
+    return (char *)"Подтверждена работоспособность новой прошивки";
+  }
+  else if (strncmp(msg->text, "Для обновления", 27) == 0)
+  {
+    return msg->text;
+  }
+  else if (strncmp(msg->text, "/upgrade_", 9) == 0)
+  {
+    int file_number = 0;
+    int ret = sscanf(msg->text, "/upgrade_%d", &file_number);
+    if (file_number == 0)
+      return (char *)"Ошибка со ссылкой на файл";
+
+    const char fmt[] = "Ссылка на файл:\ndocuments/file_%d.bin\nOTA started!";
+    int sz = snprintf(NULL, 0, fmt, file_number);
+    char *buf = (char *)esp_calloc(1, sz + 1);
+    snprintf(buf, sz + 1, fmt, file_number);
+
+    char *ota_source = malloc_stringf(COMMAND_OTA_URL_TMPL, file_number);
+    if (ota_source == nullptr)
+    {
+      rlog_e(logTAG, "Failed to allocate memory to link to ota file");
+      return (char *)"Out of memory";
+    };
+
+    otaStart(ota_source);
+    return buf;
+  }
+  else
+  {
+    const char fmt[] = "Пришла неизвестная команда:%s";
+    int sz = snprintf(NULL, 0, fmt, (const char *)msg->text);
+    char *buf = (char *)esp_calloc(1, sz + 1);
+    snprintf(buf, sz + 1, fmt, (const char *)msg->text);
+    rlog_d(logTAG, "cmdProcessor return: %s", buf);
+    return buf;
+  }
 }
 
-void printFileInfo(tgUpdateMessage_t *msg) {
-  if (msg->file) {
+void printFileInfo(tgUpdateMessage_t *msg)
+{
+  if (msg->file)
+  {
     rlog_d(logTAG, "printFileInfo name: %s,caption: %s, size: %d, id: %s",
-      msg->file->name, (msg->file->caption) ? msg->file->caption : "NO CAP", msg->file->size, msg->file->id);
-  } else {
+           (msg->file->name) ? msg->file->name : "NO name",
+           (msg->file->caption) ? msg->file->caption : "NO CAP",
+           (msg->file->size) ? msg->file->size : 0,
+           (msg->file->id) ? msg->file->id : "no id");
+  }
+  else
+  {
     rlog_d(logTAG, "no msg->file");
   }
+}
 
+char *statesGetDebugHeap()
+{
+  double heapTotal = (double)heap_caps_get_total_size(MALLOC_CAP_DEFAULT) / 1024;
+  double heapFree = (double)heap_caps_get_free_size(MALLOC_CAP_DEFAULT) / 1024;
+  double heapFreeMin = (double)heap_caps_get_minimum_free_size(MALLOC_CAP_DEFAULT) / 1024;
+
+  return malloc_stringf("%.1fkB : %.2fkB (%.1f%%) : %.2fkB (%.1f%%)",
+                        heapTotal,
+                        heapFree, 100.0 * (heapFree / heapTotal),
+                        heapFreeMin, 100.0 * (heapFreeMin / heapTotal));
 }
