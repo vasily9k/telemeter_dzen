@@ -11,7 +11,6 @@ void restart_task(void *pvParameters)
 {
   rloga_e("Перезагрузка по команде пользователя через 10 секунд");
   vTaskDelay(pdMS_TO_TICKS(10000));
-  // esp_restart(); // Restart the system
   espRestart(RR_COMMAND_RESET);
   vTaskDelete(nullptr);
 }
